@@ -52,3 +52,25 @@ type SnapshotAttributes struct {
 	Status             string `json:"status"`
 	TotalSize          int    `json:"total_size"`
 }
+
+type ValidationResponse struct {
+	Valid    bool                `json:"valid"`
+	Message  string              `json:"message"`
+	Services []string            `json:"services,omitempty"`
+	Errors   []ValidationError   `json:"errors,omitempty"`
+	Warnings []ValidationWarning `json:"warnings,omitempty"`
+}
+
+type ValidationError struct {
+	Line    int    `json:"line,omitempty"`
+	Column  int    `json:"column,omitempty"`
+	Message string `json:"message"`
+	Code    string `json:"code,omitempty"`
+	Service string `json:"service,omitempty"`
+	Field   string `json:"field,omitempty"`
+}
+
+type ValidationWarning struct {
+	Service string `json:"service,omitempty"`
+	Message string `json:"message"`
+}

@@ -83,6 +83,7 @@ func setupCommands() {
 	rootCmd.AddCommand(volumes.NewCreateCmd(c))
 	rootCmd.AddCommand(volumes.NewUploadCmd(c))
 	rootCmd.AddCommand(volumes.NewLoadCmd(c))
+	rootCmd.AddCommand(NewValidateCmd(c))
 
 	rootCmd.AddGroup(&cobra.Group{ID: constants.GroupEnvironments, Title: "Environments"})
 	rootCmd.AddCommand(env.NewCancelCmd(c))

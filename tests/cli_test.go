@@ -8,6 +8,8 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
+	"path/filepath"
+	"strings"
 	"testing"
 	"time"
 
@@ -189,6 +191,99 @@ func TestRebuildEnvironment(t *testing.T) {
 			}
 			if diff := cmp.Diff(c.stdOut.String(), test.output); diff != "" {
 				t.Error(diff)
+			}
+		})
+	}
+}
+
+func TestValidateCompose(t *testing.T) {
+	t.Parallel()
+	tests := []struct {
+		name        string
+		args        []string
+		fileContent string
+		wantOutput  string
+		wantErr     bool
+	}{
+		{
+			name: "valid compose file",
+			args: []string{"validate", "test-compose.yaml", "--json"},
+			fileContent: `version: '3.8'
+services:
+  web:
+    image: nginx:latest
+    ports:
+      - "80:80"`,
+			wantOutput: `"valid": true`,
+		},
+		{
+			name: "invalid compose file",
+			args: []string{"validate", "test-compose.yaml", "--json"},
+			fileContent: `version: '3.8'
+services:
+  web:
+    image: nginx:latest
+    ports:
+      - "80:80:80"`,
+			wantOutput: `"valid": false`,
+		},
+		{
+			name: "human readable output",
+			args: []string{"validate", "test-compose.yaml"},
+			fileContent: `version: '3.8'
+services:
+  web:
+    image: nginx:latest`,
+			wantOutput: "✅ Docker Compose file is valid",
+		},
+		{
+			name:        "file not found",
+			args:        []string{"validate", "nonexistent.yaml"},
+			fileContent: "",
+			wantErr:     true,
+		},
+	}
+
+	for _, test := range tests {
+		test := test
+		t.Run(test.name, func(t *testing.T) {
+			t.Parallel()
+
+			var args []string
+			if test.fileContent != "" {
+				tmpFile := filepath.Join(t.TempDir(), "test-compose.yaml")
+				err := os.WriteFile(tmpFile, []byte(test.fileContent), 0644)
+				if err != nil {
+					t.Fatal(err)
+				}
+
+				args = make([]string, len(test.args))
+				copy(args, test.args)
+				for i, arg := range args {
+					if arg == "test-compose.yaml" {
+						args[i] = tmpFile
+					}
+				}
+			} else {
+				args = test.args
+			}
+
+			c := newCmd(args)
+			err := c.cmd.Run()
+			if (err != nil) != test.wantErr {
+				if test.wantErr {
+					t.Errorf("Expected error but got none")
+				} else {
+					t.Errorf("Unexpected error: %v", err)
+				}
+				return
+			}
+
+			if !test.wantErr {
+				output := c.stdOut.String()
+				if !strings.Contains(output, test.wantOutput) {
+					t.Errorf("Output %q does not contain expected %q", output, test.wantOutput)
+				}
 			}
 		})
 	}
