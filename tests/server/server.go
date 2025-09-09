@@ -8,6 +8,7 @@ func NewHandler() http.Handler {
 	mux.HandleFunc("GET /environment", h.getAllEnvironments)
 	mux.HandleFunc("GET /environment/{id}", h.getEnvironmentByID)
 	mux.HandleFunc("POST /environment/{id}/rebuild", h.rebuildEnvironment)
+	mux.HandleFunc("POST /compose/validate", h.validateCompose)
 	return mux
 }
 

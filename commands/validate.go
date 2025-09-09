@@ -42,7 +42,7 @@ func handleValidateCmd(c client.Client, filename string) error {
 		params["org"] = org
 	}
 
-	url := uri.CreateResourceURI("", "compose", "", "validate", params)
+	url := uri.CreateResourceURI("", "compose/validate", "", "", params)
 	
 	resp, err := c.Requester.Do(http.MethodPost, url, "text/plain", fileContent)
 	if err != nil {
