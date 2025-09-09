@@ -67,3 +67,36 @@ var store = map[string][]types.Environment{
 		},
 	},
 }
+
+var validationFixtures = map[string]types.ValidationResponse{
+	"valid": {
+		Valid:    true,
+		Message:  "Docker Compose file is valid",
+		Services: []string{"web", "database", "redis"},
+		Warnings: []types.ValidationWarning{},
+	},
+	"invalid": {
+		Valid:   false,
+		Message: "Docker Compose file validation failed",
+		Errors: []types.ValidationError{
+			{
+				Line:    12,
+				Column:  8,
+				Message: "Invalid YAML syntax: expected ':' but found '-'",
+				Code:    "YAML_SYNTAX_ERROR",
+			},
+			{
+				Service: "web",
+				Field:   "ports",
+				Message: "Port mapping '80:80:80' is invalid",
+				Code:    "INVALID_PORT_MAPPING",
+			},
+		},
+		Warnings: []types.ValidationWarning{
+			{
+				Service: "database",
+				Message: "No restart policy specified, defaulting to 'no'",
+			},
+		},
+	},
+}

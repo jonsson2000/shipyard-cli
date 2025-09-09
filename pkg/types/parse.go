@@ -99,3 +99,11 @@ type errorResponse struct {
 		Title  string `json:"title"`
 	} `json:"errors"`
 }
+
+func UnmarshalValidation(p []byte) (*ValidationResponse, error) {
+	var r ValidationResponse
+	if err := json.Unmarshal(p, &r); err != nil {
+		return nil, errUnmarshalling
+	}
+	return &r, nil
+}
