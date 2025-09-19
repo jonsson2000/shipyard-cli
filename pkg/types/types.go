@@ -52,3 +52,21 @@ type SnapshotAttributes struct {
 	Status             string `json:"status"`
 	TotalSize          int    `json:"total_size"`
 }
+
+type Application struct {
+	ID         string                `json:"id"`
+	Attributes ApplicationAttributes `json:"attributes"`
+}
+
+type ApplicationAttributes struct {
+	Name        string `json:"name"`
+	RepoName    string `json:"repo_name"`
+	Branch      string `json:"branch"`
+	Description string `json:"description"`
+	Status      string `json:"status"`
+	CreatedAt   string `json:"created_at"`
+}
+
+type CreateApplicationResponse struct {
+	Data Application `json:"data"`
+}
